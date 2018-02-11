@@ -1,9 +1,11 @@
+require('dotenv').load();
+
 var needle = require("needle");
 var os   = require("os");
-
+var dropletId;
 var config = {};
-config.token = process.env.DOTOKEN;
-console.log("Your token is:", config.token);
+config.token = process.env.token;
+//console.log("Your token is:", config.token);
 
 var headers =
 {
@@ -40,8 +42,8 @@ var client =
 			"size":"512mb",
 			"image":imageName,
 			// Id to ssh_key already associated with account.
-			"ssh_keys":[5949695],
-			//"ssh_keys":null,
+			// "ssh_keys":[sshid],
+			"ssh_keys":null,
 			"backups":false,
 			"ipv6":false,
 			"user_data":null,
@@ -67,7 +69,7 @@ var client =
 client.listRegions(function(error, response)
 {
 	var data = response.body;
-//	console.log( JSON.stringify(response.body) );
+	// console.log( JSON.stringify(response.body) );
 
 	if( response.headers )
 	{
@@ -79,7 +81,7 @@ client.listRegions(function(error, response)
 		for(var i=0; i<data.regions.length; i++)
 		{
 			var dc = data.regions[i];
-		//	console.log(dc.slug);
+			//if(dc.slug) console.log(dc.slug);
 		}
 	}
 });
@@ -98,41 +100,56 @@ client.listRegions(function(error, response)
 // // Comment out when completed.
 // // https://developers.digitalocean.com/documentation/v2/#list-all-regions
 // // use 'slug' property
-// client.listImages(function(error, response)
-// {
-// 	var data = response.body;
-// 	//console.log( JSON.stringify(response.body) );
+client.listImages(function(error, response)
+{
+	var data = response.body;
+	//console.log( JSON.stringify(response.body) );
 
-// 	if( response.headers )
-// 	{
-// 		console.log( "Calls remaining", response.headers["ratelimit-remaining"] );
-// 	}
+	if( response.headers )
+	{
+		console.log( "Calls remaining", response.headers["ratelimit-remaining"] );
+	}
 
-// 	if( data.images )
-// 	{
-// 		for(var i=0; i<data.images.length; i++)
-// 		{
-// 			var dc = data.images[i];//console.log(dc.slug);
-// 		}
-// 	}
-// });
+	if( data.images )
+	{
+		for(var i=0; i<data.images.length; i++)
+		{
+			var dc = data.images[i];
+			//if(dc.slug!=null) console.log(dc.slug);
+		}
+	}
+});
 // #############################################
 // #3 Create an droplet with the specified name, region, and image
 // Comment out when completed. ONLY RUN ONCE!!!!!
 // // Write down/copy droplet id.
-  var name = "UnityId"+os.hostname();
+  var name = "ylu36"+os.hostname();
   var region = "nyc3"; // Fill one in from #1
- var image = "ubuntu-16-04-x64"; // Fill one in from #2
+ var image = "ubuntu-14-04-x64"; // Fill one in from #2
 
- // client.createDroplet(name, region, image, function(err, resp, body)
- // {
- // 	console.log(body);
- // 	// StatusCode 202 - Means server accepted request.
- // 	if(!err && resp.statusCode == 202)
-	// {
- // 		console.log( JSON.stringify( body, null, 3 ) );
- // 	}
- // });
+ client.createDroplet(name, region, image, function(err, resp, body)
+ {
+ 	// console.log(body);
+ 	// StatusCode 202 - Means server accepted request.
+ 	if(!err && resp.statusCode == 202)
+	{
+ 		// console.log( JSON.stringify( body, null, 3 ) );
+ 		dropletId = body.droplet.id;
+ 		console.log("droplet " + dropletId + " created successfully!");
+ 		
+ 		 setTimeout(function(){
+ 		 	client.getDroplet(dropletId, function(err, response, body) {
+		 	//	var data = response.body;
+		   // console.log(dropletId);
+		   // console.log(response.body)
+			console.log("IP address is:");
+		 	console.log(body.droplet.networks.v4[0].ip_address);
+		 });
+ 		 }, 2000);
+ 	}
+ 	else
+ 		console.log(err);
+ });
 
 // #############################################
 // #4 Extend the client to retrieve information about a specified droplet.
@@ -140,12 +157,8 @@ client.listRegions(function(error, response)
 // https://developers.digitalocean.com/documentation/v2/#retrieve-an-existing-droplet-by-id
 // REMEMBER POST != GET
 // Most importantly, print out IP address!
-var dropletId = "80973330";
-client.getDroplet(dropletId, function(err, response, body) {
-	var data = response.body;
-	// console.log(data);
-	console.log(body.droplet.networks.v4[0].ip_address);
-});
+ 
+
 // #############################################
 // #5 In the command line, ping your server, make sure it is alive!
 // ping xx.xx.xx.xx
@@ -158,7 +171,7 @@ client.getDroplet(dropletId, function(err, response, body) {
 // HINT #2, needle.delete(url, data, options, callback), data needs passed as null.
 // No response body will be sent back, but the response code will indicate success.
 // Specifically, the response code will be a 204, which means that the action was successful with no returned body data.
-client.destroyDropplet(dropletId);
+//client.destroyDropplet(dropletId);
 // 	
 // #############################################
 // #7 In the command line, ping your server, make sure it is dead!

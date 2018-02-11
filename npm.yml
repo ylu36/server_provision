@@ -1,0 +1,47 @@
+---
+- hosts: all
+    
+  tasks:
+    - name: Update and upgrade apt packages
+      become: true
+      apt:
+        upgrade: safe
+        update_cache: yes
+        cache_valid_time: 86400 #One day
+
+    - name: install git
+      apt: name=git
+      become: true  
+
+    - name: install npm
+      apt: name=npm
+      become: true  
+
+    - name: install node
+      apt: name=nodejs
+      become: true 
+
+    - name: install node
+      apt: name=node
+      become: true 
+
+    - name: git clone repository from source 
+      git:
+        repo: https://github.com/ylu36/App.git
+        dest: App
+        clone: yes
+        update: no
+
+    - name: npm install
+      shell: npm install
+      args:
+        chdir: App
+
+    #- name: symlink
+    #  command: ln -s /usr/bin/nodejs /usr/bin/node
+    #  become: true
+
+    - name: node run
+      shell: nohup bash -c "node main.js 800" &
+      args:
+        chdir: App

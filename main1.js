@@ -10,10 +10,11 @@ AWS.config.update({region: 'us-east-2',
 var ec2 = new AWS.EC2();
 
 var params = {
-   ImageId: 'ami-965e6bf3', // amzn-ami-2011.09.1.x86_64-ebs
+   ImageId: 'ami-f0f8d695', // amzn-ami-2011.09.1.x86_64-ebs
    InstanceType: 't2.micro',
    MinCount: 1,
-   MaxCount: 1
+   MaxCount: 1,
+   KeyName: 'id_rsa'
 };
 
 //printStatuses();
@@ -58,4 +59,5 @@ setTimeout(function(){
 			}
 		});
 });
-}, 10000);
+}, 30000);
+
