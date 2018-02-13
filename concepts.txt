@@ -1,0 +1,24 @@
+1. idempotency is the capability that a program can be run whatever many times but produce the same result
+examples of idempotent operation: 
+- run a nodejs program on hard drive
+- print out the working directory of a existing file
+
+examples of non-idempotetnt operaion:
+git clone a repository without checking 
+remove a file stored on the cloud via SSH
+
+2. the ip addresses of my VMs must be updated every time I create a new VM;
+   depending on VM service providers, I need different user ID/password for the VMs;
+   I need to add the SSH public key to the VMs and use my private key to accesss them
+
+3. - configuration server pushes changes to assets
+ advantage: easy to manage
+ disadvantage: need to sync often
+
+  - configuration server pulls change from assets
+  advantage: ensure assets stay in sync with config via agents
+  disadvantage: more complex
+
+
+4. not having proper CM may result in program dependencies to get outdated and therefore not able to build the program;
+   additonally, if server goes down, it becomes hard to fix the issue. In the case when environment needs to be replicated, not having proper CM may be a hassle to have to maually configure everything.  
